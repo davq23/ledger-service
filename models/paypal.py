@@ -1,4 +1,6 @@
+import json
 from pydantic import BaseModel
+from ulid import ULID
 
 from models.ledger import Ledger
 
@@ -30,8 +32,10 @@ class PaypalEventInput(BaseModel):
             resource.seller_receivable_breakdown.gross_amount = PaypalAmount()
             resource.seller_receivable_breakdown.gross_amount.currency_code = self.resource['seller_receivable_breakdown']['gross_amount']['currency_code']
             resource.seller_receivable_breakdown.gross_amount.value = self.resource['seller_receivable_breakdown']['gross_amount']['value']
+            resource.seller_receivable_breakdown.net_amount = PaypalAmount()
             resource.seller_receivable_breakdown.net_amount.currency_code = self.resource['seller_receivable_breakdown']['net_amount']['currency_code']
             resource.seller_receivable_breakdown.net_amount.value = self.resource['seller_receivable_breakdown']['net_amount']['value']
+            resource.seller_receivable_breakdown.paypal_fee = PaypalAmount()
             resource.seller_receivable_breakdown.paypal_fee.currency_code = self.resource['seller_receivable_breakdown']['paypal_fee']['currency_code']
             resource.seller_receivable_breakdown.paypal_fee.value = self.resource['seller_receivable_breakdown']['paypal_fee']['value']
 
@@ -47,6 +51,22 @@ class PaypalSellerReceivableBreakdown:
     paypal_fee: PaypalAmount
     net_amount: PaypalAmount
 
+    def as_dict(self):
+        return {
+            "gross_amount": {
+                "value": self.gross_amount.value,
+                "currency_code": self.gross_amount.currency_code
+            },
+            "net_amount": {
+                "value": self.net_amount.value,
+                "currency_code": self.net_amount.currency_code
+            },
+            "paypal_fee": {
+                "value": self.paypal_fee.value,
+                "currency_code": self.paypal_fee.currency_code
+            },
+        }
+
 class PaypalCaptureResource:
     disbursement_mode: str
     amount: PaypalAmount
@@ -57,9 +77,10 @@ class PaypalCaptureResource:
 
     def as_ledger(self):
         ledger = Ledger()
-        ledger.amount = f"-{self.amount.value}"
+        ledger.id = str(ULID())
+        ledger.amount = self.amount.value
         ledger.currency = self.amount.currency_code
         ledger.added_at = self.create_time.replace('T', ' ').replace('Z', '')
         ledger.user_id = '11111'
-
+        ledger.details = json.dumps(self.seller_receivable_breakdown.as_dict())
         return ledger

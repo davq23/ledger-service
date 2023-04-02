@@ -14,10 +14,8 @@ async def standard_response(request: Request, call_next):
         if (isinstance(response, str)):
             return JSONResponse({'msg': response})
     except ApplicationException as app_exception:
-        return JSONResponse({'msg': error.__str__()}, 200)
-    except Exception as error:
-        return JSONResponse({'msg': error.__str__()}, 500)
-    
+        return JSONResponse({'msg': app_exception.__str__()}, 200)
+   
     return response
 
 app.mount('/ledger', ledger_app)

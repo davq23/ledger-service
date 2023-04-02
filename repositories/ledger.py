@@ -7,8 +7,8 @@ def register_ledger(conn, ledger: Ledger):
     cursor = conn.cursor()
     
     cursor.execute(
-        'INSERT INTO ledger (id, reason, amount, charge_id, user_id, added_at) VALUES (%s, %s, %s, %s, %s, %s)',
-        (ledger.id, ledger.reason, ledger.amount, ledger.charge_id, ledger.user_id, ledger.added_at,)
+        'INSERT INTO ledger (id, reason, amount, charge_id, user_id, details, added_at) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+        (ledger.id, ledger.reason, ledger.amount, ledger.charge_id, ledger.user_id, ledger.details, ledger.added_at,)
     )
 
     cursor.close()
