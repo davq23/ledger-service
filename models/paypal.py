@@ -4,7 +4,6 @@ from ulid import ULID
 
 from models.ledger import Ledger
 
-
 PAYPAL_EVENT_TYPE_PAYMENT_SALE_COMPLETED = 'PAYMENT.SALE.COMPLETED'
 PAYPAL_EVENT_TYPE_PAYMENT_CAPTURE_COMPLETED = 'PAYMENT.CAPTURE.COMPLETED'
 
@@ -84,3 +83,44 @@ class PaypalCaptureResource:
         ledger.user_id = '11111'
         ledger.details = json.dumps(self.seller_receivable_breakdown.as_dict())
         return ledger
+
+class PaypalAuthorizationResponse:
+    scope: str
+    access_token: str
+    token_type: str
+    app_id: str
+    expires_in: int
+    nonce: str
+
+    @staticmethod
+    def from_dict(dictionary: dict):
+        paypal_authorization_response = PaypalAuthorizationResponse()
+        paypal_authorization_response.scope = dictionary['scope']
+        paypal_authorization_response.access_token = dictionary['access_token']
+        paypal_authorization_response.token_type = dictionary['token_type']
+        paypal_authorization_response.app_id = dictionary['app_id']
+        paypal_authorization_response.expires_in = dictionary['expires_in']
+        paypal_authorization_response.nonce = dictionary['nonce']
+
+        return paypal_authorization_response
+    
+class PaypalWebhookSignature:
+    auth_algo: str
+    cert_url: str
+    transmission_id: str
+    transmission_sig: str
+    transmission_time: str
+    webhook_event: PaypalEventInput
+    webhook_id: str
+
+    @staticmethod
+    def from_dict(dictionary: dict):
+        print(dictionary)
+        paypal_webhook_signature = PaypalWebhookSignature()
+        paypal_webhook_signature.auth_algo = dictionary['paypal-auth-algo']
+        paypal_webhook_signature.cert_url = dictionary['paypal-cert-url']
+        paypal_webhook_signature.transmission_id = dictionary['paypal-transmission-id']
+        paypal_webhook_signature.transmission_sig = dictionary['paypal-transmission-sig']
+        paypal_webhook_signature.transmission_time = dictionary['paypal-transmission-time']
+
+        return paypal_webhook_signature
