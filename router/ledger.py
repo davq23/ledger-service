@@ -25,7 +25,7 @@ def no_null_keys(dictionary: dict):
 async def authorization(request: Request, call_next):
     bearerPair = request.headers.get('Authorization')
 
-    if bearerPair == None:
+    if bearerPair is None:
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={'msg': 'Forbidden'})
     
     bearerPairSplit = bearerPair.split(' ', 2)
@@ -62,7 +62,7 @@ async def post(body: LedgerInput):
 async def get(id: str):
     ledger = get_ledger(db_connection, id)
 
-    if ledger == None:
+    if ledger is None:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={'msg': 'Not found'})
 
     return no_null_keys(vars(ledger))

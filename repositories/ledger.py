@@ -1,13 +1,15 @@
 from datetime import date, datetime
-from typing import Union
+from config.config import app_config
 from models.ledger import Ledger
+from typing import Union
 
+MAX_LEDGER_FETCH = 1000
 
 def register_ledger(conn, ledger: Ledger):
     cursor = conn.cursor()
     
     cursor.execute(
-        'INSERT INTO ledger (id, reason, amount, charge_id, user_id, details, added_at) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+        f"INSERT INTO {app_config['DB_PREFIX']}ledger (id, reason, amount, charge_id, user_id, details, added_at) VALUES (%s, %s, %s, %s, %s, %s, %s)",
         (ledger.id, ledger.reason, ledger.amount, ledger.charge_id, ledger.user_id, ledger.details, ledger.added_at,)
     )
 
@@ -22,7 +24,7 @@ def get_ledger(conn, id: str):
     cursor = conn.cursor()
 
     cursor.execute(
-        'SELECT  id, reason, amount, charge_id, added_at, user_id FROM ledger WHERE id = %s',
+        f"SELECT  id, reason, amount, charge_id, added_at, user_id FROM {app_config['DB_PREFIX']}ledger WHERE id = %s",
         (id,)
     )
 
@@ -45,12 +47,12 @@ def get_ledgers_by_user_and_dates(conn, user_id: str, start: str, end: str, offs
         offset = start
 
     cursor.execute(
-        'SELECT  id, reason, amount, charge_id, added_at, user_id FROM ledger WHERE'+
+        f"SELECT  id, reason, amount, charge_id, added_at, user_id FROM {app_config['DB_PREFIX']}ledger WHERE"+
         ' user_id = %s AND added_at >= %s AND added_at <= %s AND added_at >= %s ORDER BY added_at DESC',
         (user_id, start, end, offset,)
     )
 
-    all_rows = cursor.fetchmany(size=10000)
+    all_rows = cursor.fetchmany(size=MAX_LEDGER_FETCH)
 
     for row in all_rows:
         ledger = Ledger()

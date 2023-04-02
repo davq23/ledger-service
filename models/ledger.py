@@ -28,7 +28,7 @@ class Ledger(object):
         ledger = Ledger()
         today = datetime.datetime.now()
 
-        if input.id == None:
+        if input.id is None:
             ledger.id = str(ULID())
             ledger.added_at = today
         else:

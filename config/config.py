@@ -9,5 +9,9 @@ app_config = {
     'DB_HOST': os.environ.get('DB_HOST'),
     'DB_NAME': os.environ.get('DB_NAME'),
     'SECRET_KEY': os.environ.get('SECRET_KEY'),
-    'APP_MODE': os.environ.get('APP_MODE')
+    'APP_MODE': os.environ.get('APP_MODE'),
+    'DB_PREFIX': os.environ.get('DB_PREFIX'),
 }
+
+if app_config['DB_PREFIX'] is None:
+    app_config['DB_PREFIX'] = ''
