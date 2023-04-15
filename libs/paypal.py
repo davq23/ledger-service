@@ -1,4 +1,4 @@
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from http import client
 import json
 from ulid import ULID
@@ -43,7 +43,7 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
         'auth_algo': webhook_signature.auth_algo,
         'cert_url': webhook_signature.cert_url,
         'transmission_id': webhook_signature.transmission_id,
-        'transmission_sig': webhook_signature.transmission_sig,
+        'transmission_sig': b64decode(webhook_signature.transmission_sig),
         'transmission_time': webhook_signature.transmission_time,
         'webhook_event': webhook_signature.webhook_event,
         'webhook_id': webhook_signature.webhook_id,
@@ -61,7 +61,7 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
     bytes = http_response.read()
 
     response_str = bytes.decode('utf-8')
-    print(response_str)
+    print('response', response_str)
     paypal_response = json.loads(response_str)
 
     if paypal_response is None or 'verification_status' not in paypal_response:
@@ -71,8 +71,8 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
 
 async def paypal_handle_event(input: PaypalEventInput, access_token: str, headers: dict):
     webhook_signature = PaypalWebhookSignature.from_dict(headers)
-    webhook_signature.webhook_id = input.id
-    webhook_signature.webhook_event = input.event_type
+    webhook_signature.webhook_id = app_config['PAYPAL_WEBHOOK_ID']
+    webhook_signature.webhook_event = input.to_dict()
 
     status = await paypal_verify_webhook_signature(access_token, webhook_signature)
 

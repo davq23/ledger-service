@@ -15,6 +15,16 @@ class PaypalEventInput(BaseModel):
     summary: str
     resource: dict
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "create_time": self.create_time,
+            "resource_type": self.resource_type,
+            "event_type": self.event_type,
+            "summary": self.summary,
+            "resource": self.resource,
+        }
+
     def get_resource(self):
         resource = None
 
@@ -85,12 +95,12 @@ class PaypalCaptureResource:
         return ledger
 
 class PaypalAuthorizationResponse:
-    scope: str
-    access_token: str
-    token_type: str
-    app_id: str
-    expires_in: int
-    nonce: str
+    scope: str = ''
+    access_token: str = ''
+    token_type: str = ''
+    app_id: str = ''
+    expires_in: int = ''
+    nonce: str = ''
 
     @staticmethod
     def from_dict(dictionary: dict):
@@ -110,12 +120,12 @@ class PaypalWebhookSignature:
     transmission_id: str
     transmission_sig: str
     transmission_time: str
-    webhook_event: PaypalEventInput
+    webhook_event: dict
     webhook_id: str
 
     @staticmethod
     def from_dict(dictionary: dict):
-        print(dictionary)
+        print('dict', dictionary)
         paypal_webhook_signature = PaypalWebhookSignature()
         paypal_webhook_signature.auth_algo = dictionary['paypal-auth-algo']
         paypal_webhook_signature.cert_url = dictionary['paypal-cert-url']
