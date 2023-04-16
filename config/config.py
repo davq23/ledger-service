@@ -9,6 +9,7 @@ app_config = {
     'DB_PASSWORD': os.environ.get('DB_PASSWORD'), 
     'REDIS_HOST': os.environ.get('REDIS_HOST'),
     'REDIS_PORT': os.environ.get('REDIS_PORT'),
+    'REDIS_DB_NUM': os.environ.get('REDIS_DB_NUM'),
     'REDIS_PASSWORD': os.environ.get('REDIS_PASSWORD'),
     'DB_HOST': os.environ.get('DB_HOST'),
     'DB_NAME': os.environ.get('DB_NAME'),
