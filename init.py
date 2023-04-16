@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from libs.exceptions import ApplicationException
-from router.webhooks import webhooks_app
-from router.ledger import ledger_app
+from routers.ledger import ledger_app
+from routers.webhooks import webhooks_app
 
 app = FastAPI()
 
