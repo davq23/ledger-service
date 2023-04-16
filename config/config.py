@@ -33,3 +33,8 @@ if app_config['REDIS_PORT'] is not None:
     app_config['REDIS_PORT'] = int(app_config['REDIS_PORT'])
 else:
     app_config['REDIS_PORT'] = 6379
+
+if app_config['REDIS_DB_NUM'] is not None:
+    app_config['REDIS_DB_NUM'] = int(app_config['REDIS_DB_NUM'])
+else:
+    app_config['REDIS_DB_NUM'] = 0

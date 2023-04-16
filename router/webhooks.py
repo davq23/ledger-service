@@ -18,12 +18,10 @@ async def paypal_webhook_auth_check(request: Request, call_next):
 
     if access_token is not None:
         # Access token is valid
-        print('ACCESS TOKEN EXISTS')
         authorization_response = PaypalAuthorizationResponse()
         authorization_response.access_token = access_token
     else:
         # Access token expired
-        print('ACCESS IS EXPIRED')
         authorization_response = await paypal_login(app_config['PAYPAL_REST_API_CLIENT_ID'], app_config['PAYPAL_REST_API_CLIENT_SECRET'])
         
         if authorization_response is None:
@@ -36,12 +34,14 @@ async def paypal_webhook_auth_check(request: Request, call_next):
         )
         
     request.state.authorization_response = authorization_response
-
     return await call_next(request)
 
 @paypal_webhook.post('/notification')
 async def paypal_notification(request: Request, input: PaypalEventInput):
-    await paypal_handle_event(input, request.state.authorization_response.access_token, request.headers)
+    rawBodyEvent = await request.body()
+    jsonBody = rawBodyEvent.decode('utf-8')
+
+    await paypal_handle_event(input, jsonBody, request.state.authorization_response.access_token, request.headers)
     return {"status": "OK"}
 
 webhooks_app.mount('/paypal', paypal_webhook)

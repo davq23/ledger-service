@@ -30,8 +30,6 @@ async def authorization(request: Request, call_next):
     
     bearerPairSplit = bearerPair.split(' ', 2)
 
-    print(bearerPairSplit)
-
     if (len(bearerPairSplit) != 2):
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={'msg': 'Forbidden'})
     

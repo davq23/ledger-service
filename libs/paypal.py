@@ -39,21 +39,18 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
         'Authorization': f"Bearer {access_token}",
         'Content-Type': 'application/json'
     }
-    body = {
-        'auth_algo': webhook_signature.auth_algo,
-        'cert_url': webhook_signature.cert_url,
-        'transmission_id': webhook_signature.transmission_id,
-        'transmission_sig': b64decode(webhook_signature.transmission_sig),
-        'transmission_time': webhook_signature.transmission_time,
-        'webhook_event': webhook_signature.webhook_event,
-        'webhook_id': webhook_signature.webhook_id,
-    }
-    print(json.dumps(body))
+    body = "{"
+    body += f'"transmission_id":"{webhook_signature.transmission_id}","transmission_time":"{webhook_signature.transmission_time}",'
+    body += f'"transmission_sig":"{webhook_signature.transmission_sig}",'
+    body += f'"cert_url":"{webhook_signature.cert_url}","auth_algo":"{webhook_signature.auth_algo}",'
+    body += f'"webhook_id":"{webhook_signature.webhook_id}","webhook_event":{webhook_signature.rawSignature}'
+    body += "}"
+
     http_connection.request(
         'POST',
         '/v1/notifications/verify-webhook-signature',
         headers=headers,
-        body=json.dumps(body)
+        body=body
     )
 
     http_response = http_connection.getresponse()
@@ -61,7 +58,6 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
     bytes = http_response.read()
 
     response_str = bytes.decode('utf-8')
-    print('response', response_str)
     paypal_response = json.loads(response_str)
 
     if paypal_response is None or 'verification_status' not in paypal_response:
@@ -69,15 +65,15 @@ async def paypal_verify_webhook_signature(access_token: str, webhook_signature: 
 
     return paypal_response['verification_status']
 
-async def paypal_handle_event(input: PaypalEventInput, access_token: str, headers: dict):
+async def paypal_handle_event(input: PaypalEventInput, rawBody: str, access_token: str, headers: dict):
     webhook_signature = PaypalWebhookSignature.from_dict(headers)
     webhook_signature.webhook_id = app_config['PAYPAL_WEBHOOK_ID']
+    webhook_signature.rawSignature = rawBody
     webhook_signature.webhook_event = input.to_dict()
 
     status = await paypal_verify_webhook_signature(access_token, webhook_signature)
 
     if status != 'SUCCESS':
-        print(status)
         return
     
     resource = input.get_resource()

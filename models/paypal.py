@@ -14,6 +14,8 @@ class PaypalEventInput(BaseModel):
     event_type: str
     summary: str
     resource: dict
+    event_version: str
+    resource_version: str
 
     def to_dict(self):
         return {
@@ -23,6 +25,9 @@ class PaypalEventInput(BaseModel):
             "event_type": self.event_type,
             "summary": self.summary,
             "resource": self.resource,
+            "resource_type": self.resource_type,
+            "event_version": self.event_version,
+            "resource_version": self.resource_version,
         }
 
     def get_resource(self):
@@ -33,7 +38,7 @@ class PaypalEventInput(BaseModel):
             resource.amount = PaypalAmount()
             resource.amount.currency_code = self.resource['amount']['currency_code']
             resource.amount.value = self.resource['amount']['value']
-            resource.disbursement_mode = self.resource['disbursement_mode']
+            # resource.disbursement_mode = self.resource['disbursement_mode']
             resource.create_time = self.resource['create_time']
             resource.update_time = self.resource['update_time']
             resource.final_capture = self.resource['final_capture']
@@ -77,11 +82,11 @@ class PaypalSellerReceivableBreakdown:
         }
 
 class PaypalCaptureResource:
-    disbursement_mode: str
+    disbursement_mode: str = ''
     amount: PaypalAmount
-    create_time: str
-    update_time: str
-    final_capture: bool
+    create_time: str = ''
+    update_time: str = ''
+    final_capture: bool = False
     seller_receivable_breakdown: PaypalSellerReceivableBreakdown
 
     def as_ledger(self):
@@ -122,10 +127,10 @@ class PaypalWebhookSignature:
     transmission_time: str
     webhook_event: dict
     webhook_id: str
+    rawSignature: str = ''
 
     @staticmethod
     def from_dict(dictionary: dict):
-        print('dict', dictionary)
         paypal_webhook_signature = PaypalWebhookSignature()
         paypal_webhook_signature.auth_algo = dictionary['paypal-auth-algo']
         paypal_webhook_signature.cert_url = dictionary['paypal-cert-url']
