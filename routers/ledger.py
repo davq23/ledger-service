@@ -38,9 +38,8 @@ async def authorization(request: Request, call_next):
     if prefix != 'Bearer':
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={'msg': 'Forbidden'})
 
-    print(app_config['SECRET_KEY'])
     try:
-        payload = jwt.decode(bearer, app_config['SECRET_KEY'], ['HS256'])
+        payload = jwt.decode(bearer, app_config['SECRET_KEY'], ['HS256'], audience=app_config['LEDGER_TOKEN_AUDIENCE'])
     except Exception as e:
         print(e)
         return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={'msg': 'Forbidden'})

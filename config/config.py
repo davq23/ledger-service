@@ -20,6 +20,7 @@ app_config = {
     'PAYPAL_REST_API_TIMEOUT': os.environ.get('PAYPAL_REST_API_TIMEOUT'),
     'PAYPAL_REST_API_URL': os.environ.get('PAYPAL_REST_API_URL'),
     'SECRET_KEY': os.environ.get('SECRET_KEY'),
+    'LEDGER_TOKEN_AUDIENCE': os.environ.get('LEDGER_TOKEN_AUDIENCE').split(',')
 }
 
 if app_config['DB_PREFIX'] is None:
