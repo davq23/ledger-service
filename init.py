@@ -18,9 +18,9 @@ async def standard_response(request: Request, call_next):
    
     return response
 
-app.mount('/ledger', ledger_app)
-app.mount('/webhook', webhooks_app)
+app.mount('/webhook/v1/', webhooks_app)
+app.mount('/public/v1/', ledger_app)
 
-@app.post('/')
+@app.api_route('/', methods=['GET', 'POST'])
 async def basic_route(request: Request):
     return {'msg': 'API ready'}
